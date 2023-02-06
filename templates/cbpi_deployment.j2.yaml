@@ -1,0 +1,55 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: cbpi
+  labels:
+    app: cbpi
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: cbpi
+  template:
+    metadata:
+      labels:
+        app: cbpi
+    spec:
+      containers:
+      - name: cbpi
+        image: ghcr.io/avollkopf/craftbeerpi4
+        ports:
+        - containerPort: 8000
+        volumeMounts:
+        - name: cbpi-conf
+          mountPath: /cbpi/config
+        - name: cbpi-yaml-config
+          subPath: config.yaml
+          mountPath: /cbpi/config/config.yaml
+      initContainers:
+      - name: get-ownership
+        image: alpine:3
+        command: ['chown','-R','1000:1000','/cbpi/config']
+        volumeMounts:
+        - name: cbpi-conf
+          mountPath: /cbpi/config
+      - name: cbpi-init
+        image: ghcr.io/avollkopf/craftbeerpi4
+        command: ['cbpi', 'setup']
+        volumeMounts:
+        - name: cbpi-conf
+          mountPath: /cbpi/config
+#      - name: remove-config-yaml
+#        image: alpine:3
+#        command: ['rm','/cbpi/config/config.yaml']
+#        volumeMounts:
+#        - name: cbpi-conf
+#          mountPath: /cbpi/config
+      volumes:
+      - name: cbpi-conf
+        persistentVolumeClaim:
+          claimName: cbpi-conf-claim
+      - name: cbpi-yaml-config
+        configMap:
+          defaultMode: 420
+          name: cbpi-yaml-config

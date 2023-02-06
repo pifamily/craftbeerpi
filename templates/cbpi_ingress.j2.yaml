@@ -1,0 +1,18 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: cbpi-ingress
+  namespace: {{ cbpi_namespace }}
+spec:
+  rules:
+    - host: controlpi
+      http:
+        paths:
+          - path: /
+            pathType: Exact
+            backend:
+              service:
+                name:  cbpi-service
+                port:
+                  number: 8000
+ 

@@ -1,0 +1,21 @@
+---
+# defaults file for craftbeerpi
+manifest_folder: '/home/{{ ansible_user }}/manifests'
+cbpi_namespace: cbpi
+
+manifests : [{
+  src: cbpi_deployment.j2.yaml,
+  dest: cbpi_deployment.yaml
+},{
+  src: cbpi_service.j2.yaml,
+  dest: cbpi_service.yaml
+},{
+  src: cbpi_ingress.j2.yaml,
+  dest: cbpi_ingress.yaml
+},{
+  src: cbpi_pvc.j2.yaml,
+  dest: cbpi_pvc.yaml
+},{
+  src: cbpi_config.j2.yaml,
+  dest: cbpi_config.yaml
+}]
