@@ -20,36 +20,45 @@ spec:
         image: ghcr.io/avollkopf/craftbeerpi4
         ports:
         - containerPort: 8000
+        command: ['sleep','infinity']
         volumeMounts:
-        - name: cbpi-conf
+        - name: cbpi-conf-dir-claim
           mountPath: /cbpi/config
-        - name: cbpi-yaml-config
-          subPath: config.yaml
-          mountPath: /cbpi/config/config.yaml
-      initContainers:
-      - name: get-ownership
-        image: alpine:3
-        command: ['chown','-R','1000:1000','/cbpi/config']
-        volumeMounts:
-        - name: cbpi-conf
-          mountPath: /cbpi/config
-      - name: cbpi-init
-        image: ghcr.io/avollkopf/craftbeerpi4
-        command: ['cbpi', 'setup']
-        volumeMounts:
-        - name: cbpi-conf
-          mountPath: /cbpi/config
-#      - name: remove-config-yaml
-#        image: alpine:3
-#        command: ['rm','/cbpi/config/config.yaml']
-#        volumeMounts:
-#        - name: cbpi-conf
-#          mountPath: /cbpi/config
+        # For first run comment out the config file
+        # Exec into pod
+        # Copy /setup/config.yaml to /cbpi/config/config.yaml
+        # Run cbpi setup
+        # Mount the file
+        - name: cbpi-yaml-config-file
+          mountPath: /setup/config.yaml
+      securityContext:
+        fsGroup: 1000
+
+      #initContainers:
+      #- name: get-ownership
+      #  image: alpine:3
+      #  command: ['chown','-R','1000:1000','/cbpi/config']
+      #  volumeMounts:
+      #  - name: cbpi-conf-dir-claim
+      #    mountPath: /cbpi/config
+      #- name: remove-config-yaml
+      #  image: alpine:3
+      #  command: ['rm','/cbpi/config/config.yaml']
+      #  volumeMounts:
+      #  - name: cbpi-conf
+      #    mountPath: /cbpi/config
+      #- name: cbpi-init
+      #  image: ghcr.io/avollkopf/craftbeerpi4
+      #  command: ['cbpi', 'setup']
+      #  volumeMounts:
+      #  - name: cbpi-conf
+      #    mountPath: /cbpi/config
+#
       volumes:
-      - name: cbpi-conf
+      - name: cbpi-conf-dir-claim
         persistentVolumeClaim:
           claimName: cbpi-conf-claim
-      - name: cbpi-yaml-config
+      - name: cbpi-yaml-config-file
         configMap:
           defaultMode: 420
           name: cbpi-yaml-config
