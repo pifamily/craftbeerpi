@@ -17,13 +17,17 @@ spec:
     spec:
       containers:
       - name: cbpi
-        image: ghcr.io/avollkopf/craftbeerpi4
+        image: ghcr.io/avollkopf/craftbeerpi4:v4.1.3
+        resources:
+          requests:
+            memory: "2Gi"
+            cpu: "1.5"
         ports:
         - containerPort: 8000
         command: ['sleep','infinity']
         volumeMounts:
-        - name: cbpi-conf-dir-claim
-          mountPath: /cbpi/config
+        #- name: cbpi-conf-dir-claim
+        #  mountPath: /cbpi/config
         # For first run comment out the config file
         # Exec into pod
         # Copy /setup/config.yaml to /cbpi/config/config.yaml
@@ -55,9 +59,9 @@ spec:
       #    mountPath: /cbpi/config
 #
       volumes:
-      - name: cbpi-conf-dir-claim
-        persistentVolumeClaim:
-          claimName: cbpi-conf-claim
+      #- name: cbpi-conf-dir-claim
+      #  persistentVolumeClaim:
+      #    claimName: cbpi-conf-claim
       - name: cbpi-yaml-config-file
         configMap:
           defaultMode: 420
